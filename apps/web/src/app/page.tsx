@@ -1,0 +1,91 @@
+import { ProductCard } from "@/components/product-card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+async function getProducts() {
+  try {
+    const res = await fetch("http://localhost:4000/products", { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (e) {
+    console.error("Failed to fetch products:", e);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const products = await getProducts();
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-20">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-6 max-w-2xl">
+            <div className="inline-block px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full border border-primary/50">
+              NEW: RASPBERRY PI 5 STOCK
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              Build the Future with <span className="text-primary">ElectroStore</span>
+            </h1>
+            <p className="text-lg text-slate-300">
+              Your premium destination for electronic components, sensors, IoT modules, and robotics kits.
+              Enterprise-grade quality for hobbyists and professionals.
+            </p>
+            <div className="flex gap-4">
+              <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-white border-0">
+                Shop Components
+              </Button>
+              <Button size="lg" variant="outline" className="rounded-full bg-transparent text-white border-white/20 hover:bg-white hover:text-black">
+                View Datasheets
+              </Button>
+            </div>
+          </div>
+          {/* Abstract Tech Graphic Placeholder */}
+          <div className="w-full max-w-md h-64 bg-slate-800/50 rounded-2xl border border-white/10 relative overflow-hidden flex items-center justify-center backdrop-blur-sm">
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+            <span className="relative z-10 text-slate-400 font-mono text-sm">[ Circuit Visualization ]</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-8">Popular Categories</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {["Development Boards", "Sensors", "Robotics", "IoT & Wireless", "Tools", "Batteries"].map((cat) => (
+              <div key={cat} className="bg-card p-4 rounded-xl border hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-md text-center group">
+                <div className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base">{cat}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold">Featured Products</h2>
+            <Link href="/products" className="text-primary hover:underline flex items-center gap-1 font-semibold">
+              View All <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.length > 0 ? products.map((product: any) => (
+              <ProductCard key={product.id} product={product} />
+            )) : (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-dashed text-center">
+                <p className="mb-2">Connecting to inventory system...</p>
+                <p className="text-xs">Ensure Backend API is running on localhost:4000</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
