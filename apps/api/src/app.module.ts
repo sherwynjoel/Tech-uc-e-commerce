@@ -7,6 +7,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+
+import { UploadsController } from './uploads.controller';
 
 @Module({
   imports: [
@@ -34,7 +37,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UploadsController],
   providers: [AppService],
 })
 export class AppModule { }

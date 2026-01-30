@@ -98,7 +98,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                         </div>
 
                         <div className="flex items-baseline gap-4">
-                            <span className="text-4xl font-bold text-primary">${Number(product.price).toFixed(2)}</span>
+                            <span className="text-4xl font-bold text-primary">₹{Number(product.price).toFixed(2)}</span>
                         </div>
 
                         <div className="border-t border-b py-4 space-y-3">

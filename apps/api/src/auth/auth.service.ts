@@ -65,4 +65,21 @@ export class AuthService {
             }
         };
     }
+    async findAllUsers() {
+        return this.prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true,
+                _count: {
+                    select: { orders: true }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
 }

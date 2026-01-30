@@ -51,7 +51,7 @@ export default function CartPage() {
 
                                 <div className="flex-1 min-w-0">
                                     <h3 className="font-bold text-base truncate">{item.name}</h3>
-                                    <div className="text-primary font-semibold mt-1">${item.price.toFixed(2)}</div>
+                                    <div className="text-primary font-semibold mt-1">₹{item.price.toFixed(2)}</div>
                                 </div>
 
                                 <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function CartPage() {
                             <div className="space-y-4 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Subtotal</span>
-                                    <span className="font-medium">${total().toFixed(2)}</span>
+                                    <span className="font-medium">₹{total().toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Shipping Estimate</span>
@@ -98,12 +98,12 @@ export default function CartPage() {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Tax (GST 18%)</span>
-                                    <span className="font-medium">${(total() * 0.18).toFixed(2)}</span>
+                                    <span className="font-medium">₹{(total() * 0.18).toFixed(2)}</span>
                                 </div>
 
                                 <div className="border-t pt-4 flex justify-between text-base font-bold">
                                     <span>Total</span>
-                                    <span>${(total() * 1.18).toFixed(2)}</span>
+                                    <span>₹{(total() * 1.18).toFixed(2)}</span>
                                 </div>
                             </div>
 

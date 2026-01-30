@@ -145,7 +145,7 @@ export default function CheckoutPage() {
                         </div>
 
                         <Button type="submit" size="lg" className="w-full text-lg" disabled={loading}>
-                            {loading ? "Processing..." : `Place Order ($${(total() * 1.18).toFixed(2)})`}
+                            {loading ? "Processing..." : `Place Order (₹${(total() * 1.18).toFixed(2)})`}
                         </Button>
                     </form>
 
@@ -164,10 +164,10 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-medium truncate">{item.name}</div>
-                                            <div className="text-sm text-muted-foreground">${item.price} each</div>
+                                            <div className="text-sm text-muted-foreground">₹{item.price} each</div>
                                         </div>
                                         <div className="font-bold">
-                                            ${(item.price * item.quantity).toFixed(2)}
+                                            ₹{(item.price * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
@@ -176,15 +176,15 @@ export default function CheckoutPage() {
                             <div className="space-y-3 pt-4 border-t">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Subtotal</span>
-                                    <span>${total().toFixed(2)}</span>
+                                    <span>₹{total().toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Tax (18%)</span>
-                                    <span>${(total() * 0.18).toFixed(2)}</span>
+                                    <span>₹{(total() * 0.18).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold">
                                     <span>Total</span>
-                                    <span className="text-primary">${(total() * 1.18).toFixed(2)}</span>
+                                    <span className="text-primary">₹{(total() * 1.18).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

@@ -12,7 +12,12 @@ export class ProductsService {
     return this.prisma.product.create({ data: createProductDto as any });
   }
 
-  findAll() {
+  findAll(category?: string) {
+    if (category) {
+      return this.prisma.product.findMany({
+        where: { category }
+      });
+    }
     return this.prisma.product.findMany();
   }
 

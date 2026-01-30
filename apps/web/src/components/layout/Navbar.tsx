@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ShoppingCart, Heart, User, Menu, Phone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClientCartBadge } from "@/components/client-cart-badge";
@@ -28,7 +29,7 @@ export function Navbar() {
                         <span className="flex items-center gap-1">
                             <Phone className="h-3 w-3" /> +91 98765 43210
                         </span>
-                        <span>support@electrostore.com</span>
+                        <span>support@techuc.com</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link href="/track-order" className="hover:underline">Track Order</Link>
@@ -42,10 +43,14 @@ export function Navbar() {
                 <div className="flex items-center gap-6">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xl">E</div>
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                            ElectroStore
-                        </span>
+                        <Image
+                            src="/logo.png"
+                            alt="Tech uc Logo"
+                            width={120}
+                            height={40}
+                            className="h-10 w-auto object-contain"
+                            priority
+                        />
                     </Link>
 
                     {/* Search Bar - Center */}

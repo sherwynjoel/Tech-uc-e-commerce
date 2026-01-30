@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Badge } from "lucide-react"; // Wait, Badge is usually a component but I'll use simple span for now
 
 async function getOrders() {
@@ -43,15 +44,17 @@ export default async function AdminOrdersPage() {
                                     <td className="p-4">{order.user?.email || "Guest"}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
-                                                order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {order.status}
                                         </span>
                                     </td>
-                                    <td className="p-4 font-medium">${Number(order.total).toFixed(2)}</td>
+                                    <td className="p-4 font-medium">₹{Number(order.total).toFixed(2)}</td>
                                     <td className="p-4 text-right">
-                                        <Button variant="outline" size="sm">Manage</Button>
+                                        <Link href={`/admin/orders/${order.id}`}>
+                                            <Button variant="outline" size="sm">Manage</Button>
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}

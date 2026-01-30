@@ -7,7 +7,7 @@ export default function AdminDashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                    { label: "Total Revenue", value: "$45,231.89", icon: DollarSign, change: "+20.1% from last month", color: "text-green-600" },
+                    { label: "Total Revenue", value: "₹45,231.89", icon: DollarSign, change: "+20.1% from last month", color: "text-green-600" },
                     { label: "Orders", value: "+2350", icon: ShoppingCart, change: "+180.1% from last month", color: "text-blue-600" },
                     { label: "Products in Stock", value: "12,234", icon: Package, change: "+19 new products", color: "text-orange-600" },
                     { label: "Active Now", value: "+573", icon: TrendingUp, change: "+201 since last hour", color: "text-purple-600" },

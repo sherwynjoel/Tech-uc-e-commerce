@@ -21,8 +21,9 @@ export default function AdminLayout({
             <aside className="w-64 bg-slate-900 text-white flex flex-col fixed h-full z-10 transition-transform">
                 <div className="p-6 border-b border-white/10">
                     <Link href="/admin" className="flex items-center gap-2">
-                        <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center font-bold">E</div>
-                        <span className="text-xl font-bold">ElectroAdmin</span>
+                        {/* Placeholder for Admin Logo - reusing main site style logic if image was available, or just text */}
+                        <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center font-bold">T</div>
+                        <span className="text-xl font-bold">Tech uc Admin</span>
                     </Link>
                 </div>
 

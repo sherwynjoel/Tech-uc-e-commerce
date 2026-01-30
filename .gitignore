@@ -5,3 +5,4 @@ dist
 .next
 coverage
 .turbo
+apps/api/uploads

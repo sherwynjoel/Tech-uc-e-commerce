@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { ProductActions } from "@/components/admin/product-actions";
 import Image from "next/image";
 
 async function getProducts() {
@@ -49,11 +50,10 @@ export default async function AdminProductsPage() {
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>
                                 <td className="p-4 text-muted-foreground">{product.category}</td>
-                                <td className="p-4">${Number(product.price).toFixed(2)}</td>
+                                <td className="p-4">₹{Number(product.price).toFixed(2)}</td>
                                 <td className="p-4">{product.stock}</td>
                                 <td className="p-4 text-right">
-                                    <Button variant="ghost" size="sm">Edit</Button>
-                                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">Delete</Button>
+                                    <ProductActions productId={product.id} />
                                 </td>
                             </tr>
                         ))}

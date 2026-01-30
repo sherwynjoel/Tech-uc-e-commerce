@@ -53,7 +53,7 @@ export function ProductCard({ product }: { product: Product }) {
 
                 <div className="flex items-center justify-between pt-2">
                     <div className="text-lg font-bold text-primary">
-                        ${Number(product.price).toFixed(2)}
+                        ₹{Number(product.price).toFixed(2)}
                     </div>
                     <AddToCartButton product={product} size="icon" />
                 </div>

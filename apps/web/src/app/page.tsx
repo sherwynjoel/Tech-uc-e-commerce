@@ -27,7 +27,7 @@ export default async function Home() {
               NEW: RASPBERRY PI 5 STOCK
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Build the Future with <span className="text-primary">ElectroStore</span>
+              Build the Future with <span className="text-primary">Tech uc</span>
             </h1>
             <p className="text-lg text-slate-300">
               Your premium destination for electronic components, sensors, IoT modules, and robotics kits.

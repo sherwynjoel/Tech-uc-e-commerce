@@ -38,6 +38,7 @@ model Order {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   status    String   @default("PENDING") // PENDING, SHIPPED, DELIVERED
+  trackingUrl String?
   total     Decimal
   createdAt DateTime @default(now())
   items     OrderItem[]

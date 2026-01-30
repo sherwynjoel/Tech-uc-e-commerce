@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ElectroStore | Premium Electronic Components",
-  description: "Your one-stop shop for electronic components, sensors, and robotics.",
+  title: "Tech uc | Premium Electronic Components",
+  description: "Your one-stop shop for electronic components, sensors, and robotics at Tech uc.",
 };
 
 import { Navbar } from "@/components/layout/Navbar";
