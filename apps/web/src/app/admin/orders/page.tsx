@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Badge } from "lucide-react"; // Wait, Badge is usually a component but I'll use simple span for now
+import { Download } from "lucide-react";
 
 async function getOrders() {
     try {
@@ -52,6 +52,9 @@ export default async function AdminOrdersPage() {
                                     </td>
                                     <td className="p-4 font-medium">₹{Number(order.total).toFixed(2)}</td>
                                     <td className="p-4 text-right">
+                                        <a href={`http://localhost:4000/orders/${order.id}/invoice`} target="_blank" className="mr-2 inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground align-middle">
+                                            <Download className="h-4 w-4 mr-2" /> Invoice
+                                        </a>
                                         <Link href={`/admin/orders/${order.id}`}>
                                             <Button variant="outline" size="sm">Manage</Button>
                                         </Link>

@@ -1,3 +1,4 @@
+import { AddToCartButton } from "@/components/add-to-cart";
 import { Button } from "@/components/ui/button";
 import { Star, ShoppingCart, Truck, Check, Share2, Download, FileText } from "lucide-react";
 import Image from "next/image";
@@ -8,6 +9,7 @@ interface Product {
     name: string;
     description: string;
     price: string;
+    shippingCost: string;
     stock: number;
     category: string;
     image: string;
@@ -58,7 +60,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                 <div className="text-sm text-muted-foreground mb-6">
                     <Link href="/" className="hover:text-primary">Home</Link>
                     <span className="mx-2">/</span>
-                    <Link href={`/category/${product.category}`} className="hover:text-primary">{product.category}</Link>
+                    <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-primary">{product.category}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{product.name}</span>
                 </div>
@@ -97,8 +99,13 @@ export default async function ProductPage({ params }: { params: { id: string } }
                             </div>
                         </div>
 
-                        <div className="flex items-baseline gap-4">
+                        <div className="flex flex-col gap-1">
                             <span className="text-4xl font-bold text-primary">₹{Number(product.price).toFixed(2)}</span>
+                            {Number(product.shippingCost) > 0 && (
+                                <span className="text-sm text-muted-foreground">
+                                    + ₹{Number(product.shippingCost).toFixed(2)} Shipping
+                                </span>
+                            )}
                         </div>
 
                         <div className="border-t border-b py-4 space-y-3">
@@ -113,16 +120,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
                         </div>
 
                         <div className="flex gap-4">
-                            <div className="flex items-center border rounded-md">
-                                <button className="px-4 py-2 hover:bg-muted font-bold">-</button>
-                                <span className="w-12 text-center font-medium">1</span>
-                                <button className="px-4 py-2 hover:bg-muted font-bold">+</button>
-                            </div>
-                            <Button size="lg" className="flex-1 gap-2 text-lg">
-                                <ShoppingCart className="h-5 w-5" />
-                                Add to Cart
-                            </Button>
-                            <Button /*variant="outline"*/ size="icon" className="h-12 w-12 rounded-md border-input">
+                            <AddToCartButton product={product} size="lg" />
+                            <Button size="icon" variant="outline" className="h-12 w-12 rounded-md border-input">
                                 <Share2 className="h-5 w-5" />
                             </Button>
                         </div>
@@ -135,6 +134,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
                             <a
                                 href={product.datasheet}
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 text-primary hover:underline font-medium p-3 bg-primary/10 rounded-lg w-full justify-center transition-colors hover:bg-primary/20"
                             >
                                 <FileText className="h-5 w-5" />

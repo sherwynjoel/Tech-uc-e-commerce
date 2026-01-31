@@ -26,7 +26,10 @@ export function ClientAuthButtons() {
     if (user) {
         return (
             <div className="flex items-center gap-2">
-                <span className="text-sm font-medium hidden sm:inline-block">Hi, {user.name}</span>
+                <Link href="/profile" className="flex items-center gap-2 hover:text-primary transition-colors">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm font-medium hidden sm:inline-block">Hi, {user.name}</span>
+                </Link>
                 {user.role === 'ADMIN' && (
                     <Link href="/admin">
                         <Button variant="outline" size="sm" className="hidden sm:flex">Admin</Button>

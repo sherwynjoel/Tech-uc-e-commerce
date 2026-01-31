@@ -1,110 +1,268 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Save, Lock, Bell, Globe } from "lucide-react";
+import { CheckCircle, AlertCircle, Save, Globe, CreditCard } from "lucide-react";
+
+interface Setting {
+    key: string;
+    value: string;
+    description?: string;
+}
 
 export default function AdminSettingsPage() {
+    const [settings, setSettings] = useState<Record<string, string>>({
+        GST_PERCENTAGE: "18",
+        FREE_SHIPPING_THRESHOLD: "0",
+        STORE_PHONE: "",
+        STORE_EMAIL: "",
+        STORE_ADDRESS: "",
+        SOCIAL_INSTAGRAM: "",
+        SOCIAL_TWITTER: "", // X
+        SOCIAL_LINKEDIN: "",
+        PAYMENT_RAZORPAY_KEY: "",
+        PAYMENT_RAZORPAY_SECRET: ""
+    });
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    useEffect(() => {
+        fetch("http://localhost:4000/settings")
+            .then(res => res.json())
+            .then((data: Setting[]) => {
+                const newSettings: any = { ...settings };
+                data.forEach(s => {
+                    newSettings[s.key] = s.value;
+                });
+                setSettings(newSettings);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, []);
+
+    const handleChange = (key: string, value: string) => {
+        setSettings(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        setMessage(null);
+
+        try {
+            const updates = Object.entries(settings).map(([key, value]) => {
+                // Only save if it's different or exists? API allows upsert so generally safe to save all or check dirty.
+                // Saving all is simpler for this scale.
+                return fetch(`http://localhost:4000/settings/${key}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        value,
+                        description: getDescription(key)
+                    })
+                });
+            });
+
+            await Promise.all(updates);
+            setMessage({ type: 'success', text: "All settings updated successfully" });
+        } catch (error) {
+            setMessage({ type: 'error', text: "Failed to update some settings" });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const getDescription = (key: string) => {
+        switch (key) {
+            case "GST_PERCENTAGE": return "Global GST Percentage";
+            case "FREE_SHIPPING_THRESHOLD": return "Minimum order amount for free shipping";
+            case "STORE_PHONE": return "Contact phone number displayed to customers";
+            case "STORE_EMAIL": return "Support email address";
+            case "STORE_ADDRESS": return "Physical Store Address";
+            case "SOCIAL_INSTAGRAM": return "Instagram Profile URL";
+            case "SOCIAL_TWITTER": return "Twitter/X Profile URL";
+            case "SOCIAL_LINKEDIN": return "LinkedIn Company Page URL";
+            case "PAYMENT_RAZORPAY_KEY": return "Razorpay Public Key ID";
+            case "PAYMENT_RAZORPAY_SECRET": return "Razorpay Secret Key";
+            default: return "";
+        }
+    };
+
+    if (loading) return <div className="p-8">Loading settings...</div>;
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
-                <Button className="gap-2">
-                    <Save className="h-4 w-4" /> Save Changes
-                </Button>
-            </div>
+            <h1 className="text-3xl font-bold">System Settings</h1>
 
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* General Settings */}
-                <div className="p-6 bg-card border rounded-xl shadow-sm space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b">
-                        <Globe className="h-5 w-5 text-blue-500" />
-                        <h3 className="font-semibold text-lg">General Information</h3>
-                    </div>
+            <form onSubmit={handleSave} className="grid grid-cols-1 gap-6 max-w-5xl">
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Store Name</label>
-                        <input
-                            type="text"
-                            defaultValue="Tech uc"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Support Email</label>
-                        <input
-                            type="email"
-                            defaultValue="support@techuc.com"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Currency</label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                            <option>INR (₹)</option>
-                            <option>USD ($)</option>
-                            <option>EUR (€)</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Security Settings */}
-                <div className="p-6 bg-card border rounded-xl shadow-sm space-y-4">
-                    <div className="flex items-center gap-2 pb-2 border-b">
-                        <Lock className="h-5 w-5 text-red-500" />
-                        <h3 className="font-semibold text-lg">Security</h3>
-                    </div>
-
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                        <h4 className="font-medium text-sm mb-1">Admin Password</h4>
-                        <p className="text-xs text-muted-foreground mb-3">Last changed: 30 days ago</p>
-                        <Button variant="outline" size="sm" className="w-full">Change Password</Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-2">
-                        <div className="space-y-0.5">
-                            <label className="text-sm font-medium">Two-Factor Authentication</label>
-                            <p className="text-xs text-muted-foreground">Add an extra layer of security</p>
+                {/* Store Information */}
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        Store Information
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Store Phone</label>
+                            <input
+                                type="text"
+                                value={settings.STORE_PHONE}
+                                onChange={(e) => handleChange("STORE_PHONE", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="+91 99999 99999"
+                            />
                         </div>
-                        <div className="h-6 w-11 bg-slate-200 rounded-full relative cursor-pointer">
-                            <div className="h-5 w-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"></div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Support Email</label>
+                            <input
+                                type="email"
+                                value={settings.STORE_EMAIL}
+                                onChange={(e) => handleChange("STORE_EMAIL", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="support@example.com"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="text-sm font-medium mb-1 block">Store Address</label>
+                            <textarea
+                                value={settings.STORE_ADDRESS}
+                                onChange={(e) => handleChange("STORE_ADDRESS", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background h-20"
+                                placeholder="123 Tech Street, Silicon Valley, India"
+                            />
                         </div>
                     </div>
                 </div>
 
-                {/* Notifications */}
-                <div className="p-6 bg-card border rounded-xl shadow-sm space-y-4 md:col-span-2">
-                    <div className="flex items-center gap-2 pb-2 border-b">
-                        <Bell className="h-5 w-5 text-yellow-500" />
-                        <h3 className="font-semibold text-lg">Notifications</h3>
+                {/* Tax & Shipping Configuration */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-card p-6 rounded-xl border shadow-sm h-full">
+                        <h2 className="text-xl font-bold mb-4">Tax Configuration</h2>
+                        <div className="grid gap-4">
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">GST Percentage (%)</label>
+                                <input
+                                    type="number"
+                                    value={settings.GST_PERCENTAGE}
+                                    onChange={(e) => handleChange("GST_PERCENTAGE", e.target.value)}
+                                    className="w-full border rounded-md p-2 bg-background"
+                                    min="0" max="100" step="0.01"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Applied to all orders. Set to 0 to disable tax.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <label className="text-sm font-medium">Order Confirmation</label>
-                                <p className="text-xs text-muted-foreground">Receive email when a new order is placed</p>
+                    <div className="bg-card p-6 rounded-xl border shadow-sm h-full">
+                        <h2 className="text-xl font-bold mb-4">Shipping Configuration</h2>
+                        <div className="grid gap-4">
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">Free Shipping Threshold (₹)</label>
+                                <input
+                                    type="number"
+                                    value={settings.FREE_SHIPPING_THRESHOLD}
+                                    onChange={(e) => handleChange("FREE_SHIPPING_THRESHOLD", e.target.value)}
+                                    className="w-full border rounded-md p-2 bg-background"
+                                    min="0"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Orders below this pay for shipping. Set to 0 to disable.
+                                </p>
                             </div>
-                            <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <label className="text-sm font-medium">Low Stock Alerts</label>
-                                <p className="text-xs text-muted-foreground">Get notified when products are running low</p>
-                            </div>
-                            <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <label className="text-sm font-medium">New User Registration</label>
-                                <p className="text-xs text-muted-foreground">Receive email when a new customer registers</p>
-                            </div>
-                            <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
                         </div>
                     </div>
                 </div>
-            </div>
+
+                {/* Social Media */}
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Globe className="h-5 w-5" /> Social Media Links
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Instagram URL</label>
+                            <input
+                                type="url"
+                                value={settings.SOCIAL_INSTAGRAM}
+                                onChange={(e) => handleChange("SOCIAL_INSTAGRAM", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="https://instagram.com/techuc"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Twitter / X URL</label>
+                            <input
+                                type="url"
+                                value={settings.SOCIAL_TWITTER}
+                                onChange={(e) => handleChange("SOCIAL_TWITTER", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="https://twitter.com/techuc"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">LinkedIn URL</label>
+                            <input
+                                type="url"
+                                value={settings.SOCIAL_LINKEDIN}
+                                onChange={(e) => handleChange("SOCIAL_LINKEDIN", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="https://linkedin.com/company/techuc"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment Gateway */}
+                <div className="bg-card p-6 rounded-xl border shadow-sm">
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <CreditCard className="h-5 w-5" /> Payment Gateway (Razorpay)
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Key ID</label>
+                            <input
+                                type="password"
+                                value={settings.PAYMENT_RAZORPAY_KEY}
+                                onChange={(e) => handleChange("PAYMENT_RAZORPAY_KEY", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                                placeholder="rzp_test_..."
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">Key Secret</label>
+                            <input
+                                type="password"
+                                value={settings.PAYMENT_RAZORPAY_SECRET}
+                                onChange={(e) => handleChange("PAYMENT_RAZORPAY_SECRET", e.target.value)}
+                                className="w-full border rounded-md p-2 bg-background"
+                            />
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                        These keys are used to process payments. Keep them secure.
+                    </p>
+                </div>
+
+                {/* Save Bar */}
+                <div className="fixed bottom-6 right-6 z-50">
+                    {message && (
+                        <div className={`mb-4 p-4 rounded-xl border shadow-lg flex items-center gap-2 animate-in slide-in-from-bottom-5 ${message.type === 'success' ? 'bg-green-100 border-green-200 text-green-800' : 'bg-red-100 border-red-200 text-red-800'}`}>
+                            {message.type === 'success' ? <CheckCircle className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+                            {message.text}
+                        </div>
+                    )}
+                    <Button type="submit" size="lg" disabled={saving} className="shadow-xl">
+                        <Save className="h-4 w-4 mr-2" />
+                        {saving ? "Saving Changes..." : "Save All Settings"}
+                    </Button>
+                </div>
+            </form>
         </div>
     );
 }

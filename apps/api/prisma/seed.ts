@@ -108,6 +108,18 @@ async function main() {
         });
     }
 
+    // Seed Settings
+    // @ts-ignore
+    await prisma.systemSetting.upsert({
+        where: { key: 'GST_PERCENTAGE' },
+        update: {},
+        create: {
+            key: 'GST_PERCENTAGE',
+            value: '18',
+            description: 'The global GST percentage applied to orders'
+        }
+    });
+
     console.log('Seeding completed.');
 }
 

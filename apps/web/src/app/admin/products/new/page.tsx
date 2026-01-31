@@ -35,6 +35,8 @@ export default function CreateProductPage() {
                     ...formData,
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
+                    // @ts-ignore
+                    shippingCost: parseFloat(formData.shippingCost || "0"),
                 }),
             });
 
@@ -84,6 +86,12 @@ export default function CreateProductPage() {
                             <label className="block text-sm font-medium mb-1">Stock Quantity</label>
                             <input name="stock" type="number" required className="w-full border rounded-md p-2 bg-background" onChange={handleChange} />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Shipping Cost (₹)</label>
+                        <input name="shippingCost" type="number" step="0.01" className="w-full border rounded-md p-2 bg-background" onChange={handleChange} placeholder="0.00" />
+                        <p className="text-xs text-muted-foreground mt-1">Extra cost per unit added to the bill.</p>
                     </div>
 
                     <div>

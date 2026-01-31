@@ -5,6 +5,7 @@ export interface CartItem {
     id: number;
     name: string;
     price: number;
+    shippingCost: number;
     image: string | null;
     quantity: number;
 }
@@ -43,6 +44,7 @@ export const useCartStore = create<CartStore>()(
                                 id: product.id,
                                 name: product.name,
                                 price: Number(product.price),
+                                shippingCost: Number(product.shippingCost || 0),
                                 image: product.image,
                                 quantity: 1,
                             },
@@ -60,7 +62,7 @@ export const useCartStore = create<CartStore>()(
                 }),
             clearCart: () => set({ items: [] }),
             count: () => get().items.reduce((acc, item) => acc + item.quantity, 0),
-            total: () => get().items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+            total: () => get().items.reduce((acc, item) => acc + (item.price * item.quantity) + (item.shippingCost * item.quantity), 0),
         }),
         {
             name: 'electro-cart-storage',

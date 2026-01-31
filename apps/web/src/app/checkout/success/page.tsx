@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle, Package, FileText } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -31,11 +31,18 @@ function SuccessContent() {
                 <Link href="/">
                     <Button size="lg" className="w-full">Continue Shopping</Button>
                 </Link>
-                <Link href="/track-order">
-                    <Button variant="outline" className="w-full gap-2 block bg-white border border-gray-300">
-                        <Package className="h-4 w-4" /> Track Order
+                <Link href="/profile">
+                    <Button variant="outline" className="w-full gap-2">
+                        <Package className="h-4 w-4" /> View Order History
                     </Button>
                 </Link>
+                {orderId && (
+                    <a href={`http://localhost:4000/orders/${orderId}/invoice`} target="_blank" rel="noopener noreferrer" className="w-full block">
+                        <Button variant="secondary" className="w-full gap-2 bg-slate-100 dark:bg-slate-800 border">
+                            <FileText className="h-4 w-4" /> View Invoice
+                        </Button>
+                    </a>
+                )}
             </div>
         </div>
     );

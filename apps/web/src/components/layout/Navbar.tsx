@@ -59,9 +59,9 @@ export function Navbar() {
                             type="text"
                             name="q"
                             placeholder="Search for components, parts, or brands..."
-                            className="w-full pl-4 pr-12 py-2.5 rounded-l-md border border-r-0 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            className="w-full pl-4 pr-12 py-2.5 rounded-l-md border-0 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50"
                         />
-                        <Button type="submit" size="icon" className="rounded-l-none rounded-r-md px-6">
+                        <Button type="submit" size="icon" className="rounded-l-none rounded-r-md px-6 bg-primary text-primary-foreground hover:bg-primary/90">
                             <Search className="h-5 w-5" />
                         </Button>
                     </form>

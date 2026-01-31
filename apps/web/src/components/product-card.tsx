@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ interface Product {
 export function ProductCard({ product }: { product: Product }) {
     return (
         <div className="bg-card text-card-foreground rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
-            <div className="relative aspect-square bg-muted">
+            <Link href={`/products/${product.id}`} className="block relative aspect-square bg-muted">
                 {product.image ? (
                     <Image
                         src={product.image}
@@ -36,13 +37,15 @@ export function ProductCard({ product }: { product: Product }) {
                         Out of Stock
                     </span>
                 )}
-            </div>
+            </Link>
 
             <div className="p-4 space-y-2">
                 <div className="text-xs text-muted-foreground font-semibold">{product.category}</div>
-                <h3 className="font-bold text-base leading-tight line-clamp-2 h-10" title={product.name}>
-                    {product.name}
-                </h3>
+                <Link href={`/products/${product.id}`} className="block">
+                    <h3 className="font-bold text-base leading-tight line-clamp-2 h-10 hover:text-primary transition-colors" title={product.name}>
+                        {product.name}
+                    </h3>
+                </Link>
 
                 <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((s) => (

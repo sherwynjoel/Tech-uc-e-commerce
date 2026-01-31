@@ -2,7 +2,7 @@
 
 import { useCartStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, CheckCircle } from "lucide-react";
@@ -11,11 +11,10 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/auth-store";
 
 export default function CheckoutPage() {
-    const { items, total, clearCart } = useCartStore();
+    const { items, clearCart } = useCartStore();
     const { user } = useAuthStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -25,10 +24,42 @@ export default function CheckoutPage() {
         zip: "",
         paymentMethod: "cod" // Default to Cash on Delivery
     });
+    const [taxRate, setTaxRate] = useState(0.18);
+    const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
+
+    useEffect(() => {
+        // Fetch dynamic settings
+        fetch("http://localhost:4000/settings")
+            .then(res => res.ok ? res.json() : [])
+            .then((data: any[]) => {
+                const gst = data.find(s => s.key === 'GST_PERCENTAGE');
+                if (gst) setTaxRate(parseFloat(gst.value) / 100);
+
+                const shipping = data.find(s => s.key === 'FREE_SHIPPING_THRESHOLD');
+                if (shipping) setFreeShippingThreshold(parseFloat(shipping.value));
+            })
+            .catch(err => console.error("Using default settings", err));
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const calculateTotals = () => {
+        const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        let shipping = items.reduce((acc, item) => acc + (item.shippingCost * item.quantity), 0);
+
+        if (freeShippingThreshold > 0 && subtotal >= freeShippingThreshold) {
+            shipping = 0;
+        }
+
+        const tax = (subtotal + shipping) * taxRate;
+        const total = subtotal + shipping + tax;
+
+        return { subtotal, shipping, tax, total };
+    }
+
+    const { subtotal, shipping, tax, total: finalTotal } = calculateTotals();
 
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,7 +78,8 @@ export default function CheckoutPage() {
                 quantity: item.quantity,
                 price: item.price
             })),
-            total: total(),
+            // Backend will recalculate total, so this is just for reference/log
+            total: finalTotal,
             userId: user.id, // Real user ID
             address: {
                 street: formData.address,
@@ -69,7 +101,21 @@ export default function CheckoutPage() {
                 router.push(`/checkout/success?orderId=${order.id}`);
             } else {
                 const err = await res.json();
-                alert(`Order Failed: ${err.message || 'Unknown error'}`);
+                const msg = err.message || 'Unknown error';
+
+                // Handle "Product ID X not found" error
+                if (msg.includes("not found")) {
+                    const match = msg.match(/Product ID (\d+) not found/);
+                    if (match && match[1]) {
+                        const badId = parseInt(match[1]);
+                        // Remove the bad item directly from store state
+                        useCartStore.getState().removeItem(badId);
+                        alert(`Item (ID: ${badId}) is no longer available and has been removed from your cart. Please review your order and try again.`);
+                        return; // Stop here so user can review
+                    }
+                }
+
+                alert(`Order Failed: ${msg}`);
             }
         } catch (error) {
             console.error(error);
@@ -145,7 +191,7 @@ export default function CheckoutPage() {
                         </div>
 
                         <Button type="submit" size="lg" className="w-full text-lg" disabled={loading}>
-                            {loading ? "Processing..." : `Place Order (₹${(total() * 1.18).toFixed(2)})`}
+                            {loading ? "Processing..." : `Place Order (₹${finalTotal.toFixed(2)})`}
                         </Button>
                     </form>
 
@@ -176,15 +222,23 @@ export default function CheckoutPage() {
                             <div className="space-y-3 pt-4 border-t">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Subtotal</span>
-                                    <span>₹{total().toFixed(2)}</span>
+                                    <span>₹{subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Tax (18%)</span>
-                                    <span>₹{(total() * 0.18).toFixed(2)}</span>
+                                    <span className="text-muted-foreground">Shipping</span>
+                                    {shipping === 0 && items.some(i => i.shippingCost > 0) ? (
+                                        <span className="text-green-600 font-bold">Free</span>
+                                    ) : (
+                                        <span>₹{shipping.toFixed(2)}</span>
+                                    )}
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Tax ({(taxRate * 100).toFixed(0)}%)</span>
+                                    <span>₹{tax.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold">
                                     <span>Total</span>
-                                    <span className="text-primary">₹{(total() * 1.18).toFixed(2)}</span>
+                                    <span className="text-primary">₹{finalTotal.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

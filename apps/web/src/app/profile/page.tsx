@@ -1,0 +1,158 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/auth-store";
+import { Button } from "@/components/ui/button";
+import { Package, User, LogOut, Download } from "lucide-react";
+
+interface Order {
+    id: number;
+    createdAt: string;
+    total: string;
+    status: string;
+    items: {
+        product: {
+            name: string;
+            image: string;
+        };
+        quantity: number;
+        price: string;
+    }[];
+}
+
+export default function ProfilePage() {
+    const { user, logout } = useAuthStore();
+    const router = useRouter();
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) {
+            router.push("/login");
+            return;
+        }
+
+        fetch(`http://localhost:4000/orders/user/${user.id}`)
+            .then(res => res.json())
+            .then(data => {
+                setOrders(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, [user, router]);
+
+    if (!user) return null;
+
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-8">My Account</h1>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Profile Card */}
+                <div className="bg-card p-6 rounded-xl border shadow-sm h-fit">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <User className="h-8 w-8" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold">{user.name || "User"}</h2>
+                            <p className="text-muted-foreground">{user.email}</p>
+                            <span className="inline-block mt-2 px-2 py-1 bg-muted rounded text-xs font-medium uppercase">
+                                {user.role}
+                            </span>
+                        </div>
+                    </div>
+
+                    <Button
+                        variant="destructive"
+                        className="w-full gap-2"
+                        onClick={() => {
+                            logout();
+                            router.push("/");
+                        }}
+                    >
+                        <LogOut className="h-4 w-4" /> Sign Out
+                    </Button>
+                </div>
+
+                {/* Orders List */}
+                <div className="lg:col-span-2 space-y-6">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                        <Package className="h-5 w-5" /> Order History
+                    </h2>
+
+                    {loading ? (
+                        <div className="text-center py-12">Loading orders...</div>
+                    ) : orders.length === 0 ? (
+                        <div className="bg-card p-8 rounded-xl border text-center text-muted-foreground">
+                            No orders found.
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {orders.map((order) => (
+                                <div key={order.id} className="bg-card border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                                    <div className="bg-muted/30 p-4 flex items-center justify-between border-b">
+                                        <div className="flex flex-col sm:flex-row sm:gap-6">
+                                            <div>
+                                                <span className="text-xs text-muted-foreground block">Order Placed</span>
+                                                <span className="text-sm font-medium">{new Date(order.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="hidden sm:block">
+                                                <span className="text-xs text-muted-foreground block">Total</span>
+                                                <span className="text-sm font-medium">₹{Number(order.total).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <a
+                                                href={`http://localhost:4000/orders/${order.id}/invoice`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1 text-xs font-medium text-primary hover:underline px-3 py-1 bg-primary/10 rounded-full"
+                                            >
+                                                <Download className="h-3 w-3" /> Invoice
+                                            </a>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                                order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
+                                                    'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                {order.status}
+                                            </span>
+                                            <span className="text-sm text-muted-foreground">#{order.id.toString().padStart(5, '0')}</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4">
+                                        {/* Mobile Total */}
+                                        <div className="sm:hidden mb-4 font-bold">
+                                            Total: ₹{Number(order.total).toFixed(2)}
+                                        </div>
+                                        <div className="space-y-3">
+                                            {order.items.map((item, i) => (
+                                                <div key={i} className="flex gap-4 items-center">
+                                                    {/* We could show image here if we had it populated properly */}
+                                                    <div className="h-12 w-12 bg-muted rounded flex-shrink-0 overflow-hidden relative">
+                                                        {item.product.image && (
+                                                            <img src={item.product.image} alt="" className="object-contain w-full h-full" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-sm line-clamp-1">{item.product.name}</div>
+                                                        <div className="text-xs text-muted-foreground">Qty: {item.quantity}</div>
+                                                    </div>
+                                                    <div className="font-medium text-sm">₹{item.price}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
