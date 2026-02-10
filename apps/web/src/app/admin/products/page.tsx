@@ -45,7 +45,7 @@ export default async function AdminProductsPage() {
                             <tr key={product.id} className="hover:bg-muted/50">
                                 <td className="p-4">
                                     <div className="relative h-10 w-10 bg-white border rounded">
-                                        {product.image && <Image src={product.image} alt={product.name} fill className="object-contain p-1" />}
+                                        {product.image && <img src={product.image} alt={product.name} className="h-full w-full object-contain p-1" />}
                                     </div>
                                 </td>
                                 <td className="p-4 font-medium">{product.name}</td>

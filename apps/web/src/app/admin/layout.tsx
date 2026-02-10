@@ -60,12 +60,6 @@ export default function AdminLayout({
                     </Link>
                 </nav>
 
-                <div className="p-4 border-t border-white/10">
-                    <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-red-500/20 hover:text-red-400 text-slate-300">
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                    </Button>
-                </div>
             </aside>
 
             {/* Main Content */}
@@ -83,9 +77,20 @@ export default function AdminLayout({
                     </div>
                 </header>
 
-                <div className="p-8">
+                <div className="p-8 flex-1">
                     {children}
                 </div>
+
+                {/* Admin Footer */}
+                <footer className="border-t bg-background px-8 py-4 text-xs text-muted-foreground">
+                    <div className="flex justify-between items-center">
+                        <p>© {new Date().getFullYear()} Tech uc Admin. All rights reserved.</p>
+                        <div className="flex gap-4">
+                            <span>v1.0.0</span>
+                            <span className="text-primary font-medium">System Online</span>
+                        </div>
+                    </div>
+                </footer>
             </main>
         </div>
     );

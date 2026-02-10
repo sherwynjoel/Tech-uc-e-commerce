@@ -7,14 +7,11 @@ import { Button } from "@/components/ui/button";
 
 async function searchProducts(query: string) {
     try {
-        const res = await fetch(`http://localhost:4000/products`, { cache: "no-store" });
+        const res = await fetch(`http://localhost:4000/products?search=${encodeURIComponent(query)}`, { cache: "no-store" });
         if (!res.ok) return [];
-        const allProducts = await res.json();
-        return allProducts.filter((p: any) =>
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.category.toLowerCase().includes(query.toLowerCase())
-        );
+        return await res.json();
     } catch (e) {
+        console.error("Search fetch failed:", e);
         return [];
     }
 }

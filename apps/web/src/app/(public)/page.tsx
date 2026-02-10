@@ -2,6 +2,7 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { HeroSearchBar } from "@/components/layout/HeroSearchBar";
 
 async function getProducts() {
   try {
@@ -33,12 +34,15 @@ export default async function Home() {
               Your premium destination for electronic components, sensors, IoT modules, and robotics kits.
               Enterprise-grade quality for hobbyists and professionals.
             </p>
-            <div className="flex gap-4">
-              <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-white border-0">
-                Shop Components
-              </Button>
-              <Button size="lg" variant="outline" className="rounded-full bg-transparent text-white border-white/20 hover:bg-white hover:text-black">
-                View Datasheets
+            <HeroSearchBar />
+            <div className="flex gap-4 pt-4">
+              <Link href="/products">
+                <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-white border-0 px-8">
+                  Browse Catalog
+                </Button>
+              </Link>
+              <Button size="lg" variant="outline" className="rounded-full bg-transparent text-white border-white/20 hover:bg-white hover:text-black px-8">
+                Datasheets
               </Button>
             </div>
           </div>
