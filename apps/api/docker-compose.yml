@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: electrostore-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: electrostore
+      MYSQL_USER: electrostore_user
+      MYSQL_PASSWORD: electrostore_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword" ]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+
+volumes:
+  mysql_data:
+    driver: local
